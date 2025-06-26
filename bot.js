@@ -1,35 +1,28 @@
-require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require("node-telegram-bot-api");
+const express = require("express");
+require("dotenv").config();
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const PORT = process.env.PORT || 3000;
+const URL = process.env.RENDER_EXTERNAL_URL; // only available in Render
 
-// Handle incoming messages
-bot.on('message', async (msg) => {
-    const chatId = msg.chat.id;
-    const from = msg.from;
-    const text = msg.text;
+const bot = new TelegramBot(TOKEN, { webHook: { port: PORT } });
+const app = express();
 
-    // Check if admin is replying to a user
-    if (chatId.toString() === process.env.ADMIN_CHAT_ID) {
-        if (msg.reply_to_message && msg.reply_to_message.text.includes('USER_ID:')) {
-            const match = msg.reply_to_message.text.match(/USER_ID: (\d+)/);
-            if (match) {
-                const userId = match[1];
-                await bot.sendMessage(userId, `👨‍🏫 Admin replied:\n\n${text}`);
-                return;
-            }
-        }
+// Set the Telegram webhook
+bot.setWebHook(`${URL}/bot${TOKEN}`);
 
-        return bot.sendMessage(chatId, "❗ Please reply to a forwarded user message to respond.");
-    }
+// Basic command
+bot.onText(/\/start/, (msg) => {
+  bot.sendMessage(msg.chat.id, "Welcome to Pre-University Bot!");
+});
 
-    // Forward user message to the admin
-    const forwardText = `
-📩 Message from ${from.first_name} (@${from.username || 'no username'})  
-USER_ID: ${from.id}
+// Express endpoint for Telegram webhook
+app.post(`/bot${TOKEN}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
-💬 ${text}
-    `;
-
-    await bot.sendMessage(process.env.ADMIN_CHAT_ID, forwardText);
+app.listen(PORT, () => {
+  console.log(`Bot server listening on port ${PORT}`);
 });
