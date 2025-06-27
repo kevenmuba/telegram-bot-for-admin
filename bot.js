@@ -28,12 +28,11 @@ bot.on("message", async (msg) => {
   const text = msg.text || "";
   const from = msg.from;
 
-  // Skip bot commands
-  if (text.startsWith("/start")) return;
+  console.log("🔍 Incoming message:", JSON.stringify(msg, null, 2)); // <--- ADD THIS
 
-  // Admin replying to a user
+  // Admin is replying to a user
   if (chatId === ADMIN_CHAT_ID) {
-    if (msg.reply_to_message && msg.reply_to_message.text.includes("USER_ID:")) {
+    if (msg.reply_to_message && msg.reply_to_message.text && msg.reply_to_message.text.includes("USER_ID:")) {
       const match = msg.reply_to_message.text.match(/USER_ID: (\d+)/);
       if (match) {
         const userId = match[1];
@@ -54,6 +53,7 @@ USER_ID: ${from.id}
   `;
   await bot.sendMessage(ADMIN_CHAT_ID, forwardText);
 });
+
 
 // Webhook endpoint
 app.post(`/bot${TOKEN}`, (req, res) => {
