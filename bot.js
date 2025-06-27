@@ -2,7 +2,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 require("dotenv").config();
 
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TOKEN = process.env.BOT_TOKEN;
 const PORT = process.env.PORT || 3000;
 const URL = process.env.RENDER_EXTERNAL_URL; // only available in Render
 
