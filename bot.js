@@ -6,7 +6,7 @@ const TOKEN = process.env.BOT_TOKEN;
 const PORT = process.env.PORT || 3000;
 const URL = process.env.RENDER_EXTERNAL_URL; // only available in Render
 
-const bot = new TelegramBot(TOKEN, { webHook: { port: PORT } });
+const bot = new TelegramBot(TOKEN);
 const app = express();
 
 // Set the Telegram webhook
